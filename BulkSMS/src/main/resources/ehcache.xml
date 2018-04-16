@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ehcache>
+<ehcache>
+    <diskStore path="java.io.tmpdir"/>
+    
+    <!--Default cache used when using secondary cache  -->
+    <defaultCache
+            name="default"
+            maxElementsInMemory="5"
+            eternal="false"
+            timeToIdleSeconds="20"
+            timeToLiveSeconds="20"
+            overflowToDisk="false"
+            diskPersistent="false"
+            memoryStoreEvictionPolicy="LRU"
+            />
+            
+    <cache name="clients.paged"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+           
+    <cache name="client.byPhone"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+           
+    <cache name="client.byGroup"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+    
+    <cache name="schedule.id"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+               
+    <cache name="schedule.paged"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+           
+    <cache name="schedule.date"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+           
+    <cache name="schedule.title"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+           
+    <cache name="schedule.byGroup"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+      
+    <cache name="sms.paged"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+          
+    <cache name="sms.byGroup"
+           maxElementsInMemory="10000" 
+           eternal="false" 
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="3600" 
+           overflowToDisk="true"/>
+</ehcache>
