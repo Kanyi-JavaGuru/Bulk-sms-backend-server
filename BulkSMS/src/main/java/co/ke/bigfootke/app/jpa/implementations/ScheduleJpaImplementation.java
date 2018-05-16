@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import co.ke.bigfootke.app.jpa.entities.ScheduledSms;
+import co.ke.bigfootke.app.jpa.entities.ScheduledSmsCost;
 import co.ke.bigfootke.app.jpa.repository.ScheduleJpaRepo;
 
 @Repository
@@ -76,9 +77,9 @@ public class ScheduleJpaImplementation {
 	}
 
 	public List<ScheduledSms> findBtwnDates(Date firstDate, Date lastDate) {
-		final EntityManager manager = factory.createEntityManager();
-		
+		final EntityManager manager = factory.createEntityManager();		
 		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		
 		CriteriaQuery<ScheduledSms> query = builder.createQuery(ScheduledSms.class);
 		Root<ScheduledSms> root = query.from(ScheduledSms.class);
 		Path<Date> date = root.get("date");
@@ -86,6 +87,19 @@ public class ScheduleJpaImplementation {
 		query.where(predicate);
 		List<ScheduledSms> schedules =  manager.createQuery(query).getResultList();
 		return schedules;
+	}
+	
+	public List<ScheduledSmsCost> findCostBtwnDates(Date firstDate, Date lastDate) {
+		final EntityManager manager = factory.createEntityManager();
+		CriteriaBuilder builder = manager.getCriteriaBuilder();	
+		
+		CriteriaQuery<ScheduledSmsCost> query = builder.createQuery(ScheduledSmsCost.class);
+		Root<ScheduledSmsCost> root = query.from(ScheduledSmsCost.class);
+		Path<Date> date = root.get("dateSent");
+		Predicate predicate = builder.between(date, firstDate, lastDate);
+		query.where(predicate);
+		List<ScheduledSmsCost> smsCostList =  manager.createQuery(query).getResultList();
+		return smsCostList;
 	}
 	
 }

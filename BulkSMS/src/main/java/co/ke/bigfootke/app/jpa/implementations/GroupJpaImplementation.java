@@ -1,22 +1,13 @@
 package co.ke.bigfootke.app.jpa.implementations;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +19,8 @@ import org.springframework.stereotype.Repository;
 import co.ke.bigfootke.app.jpa.entities.Group;
 import co.ke.bigfootke.app.jpa.entities.Sms;
 import co.ke.bigfootke.app.jpa.entities.ScheduledSms;
-import co.ke.bigfootke.app.jpa.entities.ScheduledSmsCost;
 import co.ke.bigfootke.app.jpa.repository.ClientJpaRepo;
 import co.ke.bigfootke.app.jpa.repository.GroupJpaRepo;
-import co.ke.bigfootke.app.pojos.LineChartData;
 
 @Repository
 public class GroupJpaImplementation {
@@ -189,139 +178,4 @@ public class GroupJpaImplementation {
 		return cost;
 	}
 	
-	/****
-	public ResponseEntity<Object> calculateYearCosts(){
-		final EntityManager manager = factory.createEntityManager();
-		CriteriaBuilder builder = manager.getCriteriaBuilder();
-		
-		int firstMonthOfCurrentYear = 0;// 0 = january
-		int lastMonthOfCurrentYear = 11;// 11 = december
-		int firstDate = 1;
-		LineChartData yearExpenditure = new LineChartData();
-		List<LineChartData> expenditureData = new ArrayList<>();
-		Calendar currentYear = Calendar.getInstance(TimeZone.getTimeZone("Africa/Kenya"));
-		//iterate through the months of the year
-		for(int month = firstMonthOfCurrentYear; month<=lastMonthOfCurrentYear; month++) {
-			//set month starting with 0=january
-			currentYear.set(Calendar.MONTH, month);
-			//set DATE to 1st, so first date of that month
-			currentYear.set(Calendar.DATE, firstDate);
-			//get the date for the first day of that month
-			Date firstDateOfMonth = currentYear.getTime();
-			// set actual maximum date of that month
-			currentYear.set(Calendar.DATE, currentYear.getActualMaximum(Calendar.DAY_OF_MONTH));
-			//get the date for the last day of that month
-			Date lastDateOfMonth = currentYear.getTime();
-			
-			//initial month expenditure is zero
-			int monthExpenditure = 0;
-			//Query to get that months sms's between first and last dates
-			CriteriaQuery<OnDemandSms> query = builder.createQuery(OnDemandSms.class);
-			Root<OnDemandSms> root = query.from(OnDemandSms.class);
-			Path<Date> date = root.get("date");
-			Predicate predicate = builder.between(date, firstDateOfMonth, lastDateOfMonth);
-			query.where(predicate);
-			List<OnDemandSms> perMonthSmsList =  manager.createQuery(query).getResultList();
-			//if not expenses for that month calculate the total expenditure
-			if(perMonthSmsList != null) {
-				for(OnDemandSms sms : perMonthSmsList) {
-					monthExpenditure = monthExpenditure + sms.getCost().intValue();
-				}
-			}
-			//add that months totalExpenditure to list
-			yearExpenditure.getData().add(monthExpenditure);
-			
-		}
-		yearExpenditure.setLabel(Integer.toString(currentYear.get(Calendar.YEAR))+" - OnDemandSms Expenditure");
-		return new ResponseEntity<Object>(expenditureData.add(yearExpenditure), HttpStatus.OK);
-	}****/
-	
-	public ResponseEntity<Object> calculateYearCosts(){
-		final EntityManager manager = factory.createEntityManager();
-		CriteriaBuilder builder = manager.getCriteriaBuilder();
-		
-		int firstMonthOfCurrentYear = 0;// 0 = january
-		int lastMonthOfCurrentYear = 11;// 11 = december
-		int firstDate = 1;
-		
-		int monthSmsExpenditure = 0;
-		int monthScheduleExpenditure = 0;
-		
-		List<Integer> accruedMonthSmsExpenditure = new ArrayList<>();		
-		List<Integer> accruedMonthScheduleExpenditure = new ArrayList<>();
-		
-		LineChartData yearSmsExpenditure = new LineChartData();
-		LineChartData yearScheduleExpenditure = new LineChartData();
-		
-		List<LineChartData> expenditureData = new ArrayList<>();
-		Calendar currentYear = Calendar.getInstance(TimeZone.getTimeZone("Africa/Kenya"));
-		//iterate through the months of the year
-		for(int month = firstMonthOfCurrentYear; month<=lastMonthOfCurrentYear; month++) {
-			//set month starting with 0=january
-			currentYear.set(Calendar.MONTH, month);
-			//set DATE to 1st, so first date of that month
-			currentYear.set(Calendar.DATE, firstDate);
-			//get the date for the first day of that month
-			Date firstDateOfMonth = currentYear.getTime();
-			// set actual maximum date of that month
-			currentYear.set(Calendar.DATE, currentYear.getActualMaximum(Calendar.DAY_OF_MONTH));
-			//get the date for the last day of that month
-			Date lastDateOfMonth = currentYear.getTime();
-			monthSmsExpenditure = calculateOnDemandSmsCost(manager, builder, firstDateOfMonth, lastDateOfMonth, currentYear);
-			monthScheduleExpenditure = calculateScheduleCost(manager, builder, firstDateOfMonth, lastDateOfMonth, currentYear);
-			accruedMonthSmsExpenditure.add(monthSmsExpenditure);
-			accruedMonthScheduleExpenditure.add(monthScheduleExpenditure);
-		}
-		String year = Integer.toString(currentYear.get(Calendar.YEAR));
-		
-		yearSmsExpenditure.setLabel(year+" OnDemandSms Expenditure");
-		yearSmsExpenditure.setMonthlyExpenditure(accruedMonthSmsExpenditure);
-		
-		yearScheduleExpenditure.setLabel(year+" Schedules Expenditure");
-		yearScheduleExpenditure.setMonthlyExpenditure(accruedMonthScheduleExpenditure);
-		
-		expenditureData.add(yearSmsExpenditure);
-		expenditureData.add(yearScheduleExpenditure);
-		
-		return new ResponseEntity<Object>(expenditureData, HttpStatus.OK);
-	}
-	
-	private int calculateOnDemandSmsCost(EntityManager manager, CriteriaBuilder builder, 
-													Date firstDateOfMonth, Date lastDateOfMonth, Calendar currentYear){
-		//initial month expenditure is zero
-		int monthExpenditure = 0;
-		CriteriaQuery<Sms> query = builder.createQuery(Sms.class);
-		Root<Sms> root = query.from(Sms.class);
-		Path<Date> date = root.get("date");
-		Predicate predicate = builder.between(date, firstDateOfMonth, lastDateOfMonth);
-		query.where(predicate);
-		List<Sms> perMonthSmsList =  manager.createQuery(query).getResultList();
-		//if not expenses for that month calculate the total expenditure
-		if(perMonthSmsList != null) {
-			for(Sms sms : perMonthSmsList) {
-				monthExpenditure = monthExpenditure + sms.getCost();
-			}
-		}
-		return monthExpenditure;
-	}
-	
-	private int calculateScheduleCost(EntityManager manager, CriteriaBuilder builder, 
-												Date firstDateOfMonth, Date lastDateOfMonth, Calendar currentYear){
-		//initial month expenditure is zero
-		int monthExpenditure = 0;
-		//Query to get that months sms's between first and last dates
-		CriteriaQuery<ScheduledSmsCost> query = builder.createQuery(ScheduledSmsCost.class);
-		Root<ScheduledSmsCost> root = query.from(ScheduledSmsCost.class);
-		Path<Date> date = root.get("dateSent");
-		Predicate predicate = builder.between(date, firstDateOfMonth, lastDateOfMonth);
-		query.where(predicate);
-		List<ScheduledSmsCost> perMonthScheduleList =  manager.createQuery(query).getResultList();
-		//if not expenses for that month calculate the total expenditure
-		if(perMonthScheduleList != null) {
-			for(ScheduledSmsCost schedule : perMonthScheduleList) {
-				monthExpenditure = monthExpenditure + schedule.getCost();
-			}
-		}
-		return monthExpenditure;
-	}
 }

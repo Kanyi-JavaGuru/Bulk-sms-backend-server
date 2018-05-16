@@ -7,7 +7,6 @@ public class SmsContainer {
 	private String message;
 	private int cost;
 	private List<Long> groupIds;
-	private Long senderId;
 	
 	public SmsContainer() {
 	}
@@ -35,13 +34,4 @@ public class SmsContainer {
 	public void setGroupIds(List<Long> groupIds) {
 		this.groupIds = groupIds;
 	}
-
-	public Long getSenderId() {
-		return senderId;
-	}
-
-	public void setSenderId(Long senderId) {
-		this.senderId = senderId;
-	}
-	
 }

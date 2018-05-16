@@ -105,6 +105,7 @@ public class Sms {
 		this.groups = groups;
 	}
 
+	@JsonIgnore
 	public User getSender() {
 		return sender;
 	}

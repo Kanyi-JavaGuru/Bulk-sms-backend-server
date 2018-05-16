@@ -1,32 +1,29 @@
-package co.ke.bigfootke.app.oath;
+package co.ke.bigfootke.app.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.GlobalAuthenticationConfigurerAdapter;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class AuthenticationServer extends GlobalAuthenticationConfigurerAdapter {
 	@Autowired
 	private UserDetailsService customUserDetailsService;
 
-	public void init(AuthenticationManagerBuilder authUsers) 
-			throws Exception {	
-		//comment this 
-		authUsers.inMemoryAuthentication()
-		.withUser("allen")
-		.password("pass")
-		.roles("USER")
-	.and()
-		.withUser("ben")
-		.password("pass1")
-		.roles("USER","ADMIN")
+	public void init(AuthenticationManagerBuilder authUsers) throws Exception {	
+		authUsers.userDetailsService(customUserDetailsService)
+		.passwordEncoder(passwordEncoder())
 		;
-		//uncomment this to enable authentication
-//			authUsers.userDetailsService(customUserDetailsService);	
-		
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();		
 	}
 }

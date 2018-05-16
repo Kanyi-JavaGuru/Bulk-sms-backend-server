@@ -52,29 +52,9 @@ public class Group {
 				inverseJoinColumns=@JoinColumn(name = "sms_fk"),
 				joinColumns=@JoinColumn(name = "group_fk"))
 	private Sms sms;
-	
-	/**ScheduledMessage being mappedBy 
-	 * Group 
-	 * to form Group_ScheduledMessage
-//	@ManyToMany(fetch = FetchType.EAGER,
-//				cascade = CascadeType.ALL)
-//	@JoinTable(name="smessage_group",
-//		joinColumns=
-//			@JoinColumn(name = "group_fk"),
-//		inverseJoinColumns=
-//			@JoinColumn(name = "smessage_fk"))
-//	@JsonBackReference(value = "smsg_groups")
-//	private Set<ScheduledMessage> sMessage;
-	**/
-	
+		
 	public Group() {
 	}	
-	
-	public Group(Group group) {
-		this.groupId = group.groupId;
-		this.name = group.name;
-		this.clients = group.clients;
-	}
 
 	public Long getGroupId() {
 		return groupId;
@@ -88,6 +68,7 @@ public class Group {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	@JsonIgnore
 	public Set<Client> getClients() {
 		return clients;
@@ -95,30 +76,7 @@ public class Group {
 	public void setClients(Set<Client> clients) {
 		this.clients = clients;
 	}
-//	@JsonIgnore
-//	public Set<DateSchedule> getDateSchedule() {
-//		return dateSchedule;
-//	}
-//
-//	public void setDateSchedule(Set<DateSchedule> dateSchedule) {
-//		this.dateSchedule = dateSchedule;
-//	}
-//	@JsonIgnore
-//	public Set<WeekSchedule> getWeekSchedule() {
-//		return weekSchedule;
-//	}
-//	
-//	public void setWeekSchedule(Set<WeekSchedule> weekSchedule) {
-//		this.weekSchedule = weekSchedule;
-//	}
-//	@JsonIgnore
-//	public Set<MonthSchedule> getMonthSchedule() {
-//		return monthSchedule;
-//	}
-//
-//	public void setMonthSchedule(Set<MonthSchedule> monthSchedule) {
-//		this.monthSchedule = monthSchedule;
-//	}
+	
 	@JsonIgnore
 	public Sms getSms() {
 		return sms;

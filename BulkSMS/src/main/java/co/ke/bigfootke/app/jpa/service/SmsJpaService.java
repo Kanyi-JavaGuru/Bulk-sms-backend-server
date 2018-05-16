@@ -44,12 +44,12 @@ public class SmsJpaService {
 	private static final Logger log = LoggerFactory.getLogger(SmsJpaService.class);
 	private Map<String, String> response;
 	
-	public Sms saveSms(Sms sms, List<Long> groupIds,  Long userId) {	
+	public Sms saveSms(Sms sms, List<Long> groupIds) {	
 		Sms newSms = repository.create(sms);
 		//Link groups to sms
 		groupImpl.addToOnDemandSms(newSms.getSmsId(), groupIds);
 		//Link sms to user
-		userImpl.addToSms(newSms.getSmsId(), userId);
+		userImpl.addToSms(newSms.getSmsId());
 		return newSms;
 	}
 
@@ -100,7 +100,7 @@ public class SmsJpaService {
 			Calendar today = Calendar.getInstance();
 	        Sms newSms = new Sms(smsRequest.getMessage(), smsRequest.getCost(), today.getTime());
 	        //save the sent sms
-	        Sms processedSms = saveSms(newSms, smsRequest.getGroupIds(), smsRequest.getSenderId());
+	        Sms processedSms = saveSms(newSms, smsRequest.getGroupIds());
 	        //process the groups to get their clients full phoneNo
 	        String recipients = processGroups(processedSms.getGroups());
 			//Send to africastalking api and receive response

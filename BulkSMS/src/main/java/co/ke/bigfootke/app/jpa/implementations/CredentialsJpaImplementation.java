@@ -7,6 +7,7 @@ import javax.persistence.PersistenceUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import co.ke.bigfootke.app.jpa.entities.Credentials;
@@ -23,17 +24,11 @@ public class CredentialsJpaImplementation {
 	private static final Logger log = LoggerFactory.getLogger(CredentialsJpaImplementation.class);
 		
 	public void create(User user, Credentials credentials) {
-		final EntityManager manager = factory.createEntityManager();
-		manager.getTransaction().begin();
-		
-		Credentials newCred = repository.save(credentials);
-		
-		newCred.setActive(true);
-		newCred.setLoggedIn(false);
-		newCred.setUser(user);
-		manager.merge(newCred);
-		manager.getTransaction().commit();
-		
+		//save encrypted password	
+		log.info("***** User's: "+credentials);
+		credentials.setPassword(new BCryptPasswordEncoder().encode(credentials.getPassword()));
+		credentials.setUser(user);		
+		Credentials newCred = repository.save(credentials);		
 		log.info("***** Created: "+newCred);
 	}
 

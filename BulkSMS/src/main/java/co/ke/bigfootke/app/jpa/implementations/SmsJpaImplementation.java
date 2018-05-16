@@ -1,7 +1,16 @@
 package co.ke.bigfootke.app.jpa.implementations;
 
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +47,18 @@ public class SmsJpaImplementation {
 		Sms sms = repository.findOne(smsId);	
 		log.info("***** Found: "+sms);
 		return sms;
+	}
+	
+	public List<Sms> findBtwnDates(final Date firstDay, final Date lastDay) {
+		final EntityManager manager = factory.createEntityManager();
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		
+		CriteriaQuery<Sms> query = builder.createQuery(Sms.class);
+		Root<Sms> root = query.from(Sms.class);
+		Path<Date> date = root.get("date");
+		Predicate predicate = builder.between(date, firstDay, lastDay);
+		query.where(predicate);
+		return manager.createQuery(query).getResultList();
 	}
 	
 	public ResponseEntity<Page<Sms>> findAll(final int pageNo, final int pageSize){

@@ -1,5 +1,7 @@
 package co.ke.bigfootke.app.jpa.entities;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -30,8 +31,7 @@ public class Credentials {
 	@Column(name="logged_in")
 	private boolean loggedIn;	
 	
-	@NotBlank(message="Please enter password")
-	@Size(min=6, message="Invalid password enter at least 6 characters")
+//	@NotBlank(message="Please enter password")
 	@Column(name="password")
 	private String password;
 	
@@ -40,7 +40,7 @@ public class Credentials {
 	private String role;
 	
 	@Column(name="last_signin")
-	private String lastSignIn;
+	private Date lastSignIn;
 
 	@OneToOne
 	@JoinColumn(name = "user_id")
@@ -54,7 +54,6 @@ public class Credentials {
 		return credentialsId;
 	}
 
-	@JsonSetter
 	public void setCredentialsId(int access_id) {
 		this.credentialsId = access_id;
 	}
@@ -80,6 +79,7 @@ public class Credentials {
 		return password;
 	}
 
+	@JsonSetter
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -101,11 +101,11 @@ public class Credentials {
 		this.user = user;
 	}
 
-	public String getLastSignIn() {
+	public Date getLastSignIn() {
 		return lastSignIn;
 	}
 
-	public void setLast_sign_in(String lastSignIn) {
+	public void setLast_sign_in(Date lastSignIn) {
 		this.lastSignIn = lastSignIn;
 	}
 

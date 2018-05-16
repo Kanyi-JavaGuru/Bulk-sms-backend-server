@@ -42,5 +42,10 @@ public class Credit {
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	@Override
+	public String toString() {
+		return "Credit [id=" + id + ", amount=" + amount + "]";
 	}	
 }

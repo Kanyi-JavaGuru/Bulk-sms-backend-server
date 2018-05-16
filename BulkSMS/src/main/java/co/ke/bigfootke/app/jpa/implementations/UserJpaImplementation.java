@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import co.ke.bigfootke.app.jpa.entities.Sms;
 import co.ke.bigfootke.app.jpa.entities.User;
 import co.ke.bigfootke.app.jpa.repository.UserJpaRepo;
+import co.ke.bigfootke.app.user.authentication.AuthenticationFacade;
 
 @Repository
 public class UserJpaImplementation {
@@ -23,6 +24,8 @@ public class UserJpaImplementation {
 	UserJpaRepo repository;
 	@Autowired
 	SmsJpaImplementation userImpl;
+	@Autowired
+	private AuthenticationFacade authentication;
 	@PersistenceUnit
 	EntityManagerFactory factory;
 	private static final Logger log = LoggerFactory.getLogger(UserJpaImplementation.class);
@@ -54,11 +57,8 @@ public class UserJpaImplementation {
 	/**
 	 * users are deleted by email rather than id**/
 	public void delete(Long userId) {
-		if(exists(userId)) {
-			final User user = findById(userId);	
-			repository.delete(userId);		
-			log.info("***** deleted: "+user);	
-		}
+		repository.delete(userId);
+		log.info("***** Deleted user with id: "+userId);
 	}
 
 	public User update(User newUser) {
@@ -78,18 +78,17 @@ public class UserJpaImplementation {
 		return updatedUser;
 	}
 
-	public ResponseEntity<Object> addToSms(Long smsId, Long userId) {
+	public ResponseEntity<Object> addToSms(Long smsId) {
 		final EntityManager manager = factory.createEntityManager();
 		manager.getTransaction().begin();
 		
 		final Sms sms = userImpl.findById(smsId);
-		if(exists(userId)) {
-			final User sender = findById(userId);
+			//retrieve currently signed in user
+			User sender = (User) authentication.getAuthentication().getPrincipal();
 			sms.setSender(sender);
 			log.info("***** Link: "+sms+" to the sender "+sender);
 			manager.merge(sms);
 			manager.getTransaction().commit();
-		}
 		return new ResponseEntity<Object>(sms, HttpStatus.OK);
 	}
 }

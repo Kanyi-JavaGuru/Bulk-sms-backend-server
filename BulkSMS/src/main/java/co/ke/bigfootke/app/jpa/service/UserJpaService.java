@@ -6,12 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import co.ke.bigfootke.app.jpa.entities.User;
+import co.ke.bigfootke.app.jpa.implementations.CredentialsJpaImplementation;
 import co.ke.bigfootke.app.jpa.implementations.UserJpaImplementation;
 
 @Service
 public class UserJpaService{
 	@Autowired
 	UserJpaImplementation repository;
+	@Autowired
+	CredentialsJpaImplementation credRepo;
 
 	
 	public ResponseEntity<Object> create(User user) {
@@ -30,8 +33,12 @@ public class UserJpaService{
 		return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
 	}
 	
-	public User findByEmail(String email) {
-		return repository.findByEmail(email);
+	public ResponseEntity<Object> findByEmail(String email) {
+		User user = repository.findByEmail(email);
+		if(user != null){
+			return new ResponseEntity<Object>( user, HttpStatus.OK);
+		}
+		return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
 	}
 	
 	public ResponseEntity<Object> update(User user) {
@@ -41,8 +48,10 @@ public class UserJpaService{
 	}
 	
 	public ResponseEntity<Object> delete(Long userId) {
-		if(repository.exists(userId))
-			return new ResponseEntity<Object>(HttpStatus.OK);
+		if(repository.exists(userId)) {
+			repository.delete(userId);
+			return new ResponseEntity<Object>( HttpStatus.OK);
+		}
 		return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);		
 	}	
 }

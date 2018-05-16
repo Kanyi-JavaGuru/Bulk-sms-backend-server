@@ -14,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 public class SmsDispatcher {
 	private Map<String, String> response;
 	private static final Logger log = LoggerFactory.getLogger(SmsDispatcher.class);	
-	private String username = "KevinWolf254";
-	private String apiKey = "83d67fbaaada158aaaede8d41aced7ca35582cad4ebd51409135b35ef49f436d";
+	private String username = "";
+	private String apiKey = "";
 	
 	private AfricasTalkingGateway gateway  = new AfricasTalkingGateway(username, apiKey);
 	

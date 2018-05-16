@@ -2,7 +2,7 @@ package co.ke.bigfootke.app.jpa.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +15,6 @@ import co.ke.bigfootke.app.pojos.Family;
 
 @RestController
 @RequestMapping(value = "api/group")
-@CrossOrigin(origins="http://localhost:4200")
 public class GroupJpaController {
 	@Autowired
 	private GroupJpaService service;
@@ -50,28 +49,30 @@ public class GroupJpaController {
 		return service.delete(groupId);
 	}
 		
-	@RequestMapping(method=RequestMethod.POST, value="/add")
+	@RequestMapping(method=RequestMethod.POST, value="/addToSms")
 	public ResponseEntity<Object> addToOnDemandSms(@RequestBody Family family) {		
 		return service.addToOnDemandSms(family.getParentId(), family.getChildrenIds());
 	}
 	
-	@RequestMapping(method=RequestMethod.POST, value="/group")
+	@RequestMapping(method=RequestMethod.POST, value="/addToSchedule")
 	public ResponseEntity<Object> addToSchedule(@RequestBody Family family) {		
 		return service.addToSchedule(family.getParentId(), family.getChildrenIds());
 	}
 	
-	@RequestMapping(method=RequestMethod.DELETE, value = "/delete/{smsId}/from/{groupId}")	
-	public ResponseEntity<Object> deleteFromSchedule(@PathVariable Long smsId, @PathVariable Long groupId){
-		return service.deleteFromSchedule(smsId, groupId);
+	@RequestMapping(method=RequestMethod.DELETE, value = "/delete/{groupId}/from/{scheduleId}")	
+	public ResponseEntity<Object> deleteFromSchedule( @PathVariable Long groupId, @PathVariable Long scheduleId){
+		return service.deleteFromSchedule(scheduleId, groupId);
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(method=RequestMethod.GET, value="/costs")
 	public ResponseEntity<Object> calculateGroupCosts(@RequestBody Family family) {		
 		return service.calculateGroupCosts(family.getChildrenIds());
 	}
 	
+	@PreAuthorize("hasRole('ADMIN')")
 	@RequestMapping(method=RequestMethod.GET, value="/costs/year")
-	public ResponseEntity<Object> calculateYearCosts() {		
-		return service.calculateYearCosts();
+	public ResponseEntity<Object> calculateYearCosts(){		
+		return service.getMonthlyExpense(2018);
 	}
 }

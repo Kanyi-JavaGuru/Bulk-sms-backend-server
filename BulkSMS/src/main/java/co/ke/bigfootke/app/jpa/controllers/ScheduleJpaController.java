@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +19,6 @@ import co.ke.bigfootke.app.pojos.ScheduledSmsContainer;
 
 @RestController
 @RequestMapping(value = "api/schedule")
-@CrossOrigin(origins="http://localhost:4200")
 public class ScheduleJpaController {
 
 	@Autowired
